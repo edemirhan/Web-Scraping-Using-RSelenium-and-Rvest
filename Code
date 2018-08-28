@@ -1,0 +1,70 @@
+install.packages("rvest")
+install.packages("RSelenium")
+install.packages("xlsx")
+
+library(RSelenium)
+library(xml2)
+library(rvest)
+library(curl)
+library(xlsx)
+
+
+RSelenium::startServer() # if needed
+remDr2 <- remoteDriver(browserName = "chrome")
+remDr2$open()
+head(remDr2$sessionInfo)
+remDr2$navigate("https://www.reddit.com/r/worldnews/comments/3sphue/shootings_reported_in_central_paris_reports_of/?depth=1")
+
+RSelenium::startServer() # if needed
+remDr <- remoteDriver(browserName = "safari")
+remDr$open()
+head(remDr$sessionInfo)
+remDr$navigate("https://www.reddit.com/r/worldnews/comments/3sphue/shootings_reported_in_central_paris_reports_of/?depth=1")
+
+#clicker - find css catcher through inspect element
+#webelem1<-remDr$findElement("id","more_t1_[A-Z]")
+#webelem1$clickElement()
+
+while (TRUE) {
+  webelem9<-remDr2$findElement("partial link text", "load more")
+  webelem9$clickElement()
+  #Sys.sleep(4)
+  #setImplicitWaitTimeout(milliseconds = 2000) 
+}
+
+
+while (TRUE) {
+    webelem2<-remDr$findElement("id", "more_t1_d1900lc")
+    webelem2$clickElement()
+    #Sys.sleep(1)
+}
+
+while (TRUE) {
+  webelem2<-remDr$findElement("id", "more_t1_d1900lc")
+  webelem2$clickElement()
+  #Sys.sleep(1)
+}
+
+while (TRUE) {
+  webelem2<-remDr$findElement("id", "more_t1_d1922v4")
+  webelem2$clickElement()
+  #Sys.sleep(1)
+}
+
+webelem5<-remDr$findElement("partial link text", "loadin")
+webelem5$clickElement()
+
+
+
+# find css catcher for comment by 
+#"right click, inspect, search 'sitetable nestedlisting'
+#copy the id on its left and paste it here instead of siteTable...
+test.html <- read_html(remDr2$getPageSource()[[1]])
+result<-test.html %>%
+  html_nodes(".author,.tagline .unvoted, #siteTable_t3_3sphue .md p")%>%
+  html_text()
+  result
+
+#save - change file name
+data.frame(result) %>% View()
+write.xlsx(result, file = "/Users/.../redditcomments.xlsx")
